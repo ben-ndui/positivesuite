@@ -7,7 +7,7 @@ class AuthenticationService extends ChangeNotifier {
 
   /// Transform Firebase User to my own MyUser object
   MyUser? _userFromFirebaseUser(User? user){
-    return user != null ? MyUser(user.uid, user.displayName, user.email) : null;
+    return user != null ? MyUser(user.uid, user.displayName, user.email, user.phoneNumber, user.tenantId) : null;
   }
 
   Stream<MyUser?> get user => _auth.authStateChanges().map(_userFromFirebaseUser);

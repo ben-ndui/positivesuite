@@ -23,7 +23,7 @@ class Database {
   }
 
   MyUser _userFromSnapShot(DocumentSnapshot snapshot) {
-    return MyUser("", "", "");
+    return MyUser("", "", "","","");
   }
 
   /// Stream to get current user

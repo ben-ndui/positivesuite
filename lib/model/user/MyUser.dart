@@ -7,10 +7,12 @@ import 'package:flutter/material.dart';
 
 class MyUser {
   ///User attibutes
-  String? uid, name = "", email = "", phone = "", location = "";
+  final String? uid, name, email, phone, location;
 
   ///__Constructor
-  MyUser(this.uid, this.name, this.email,);
+  MyUser(this.uid, this.name, this.email, this.phone, this.location);
+
+
 
   /// Return user name
   getName() => this.name;
@@ -29,14 +31,14 @@ class MyUser {
     return {
       'uid': this.uid,
       'name': this.name,
-      'lastname': this.email,
-      'birthday': this.phone,
+      'email': this.email,
+      'phone': this.phone,
       'location': this.location
     };
   }
 
   /// Convert a Map object to a user object
   factory MyUser.fromMap(Map<String, dynamic> map) {
-    return new MyUser(map['uid'], map['name'], map['lastname'],);
+    return new MyUser(map['uid'], map['name'], map['email'],map['phone'], map['location']);
   }
 }
