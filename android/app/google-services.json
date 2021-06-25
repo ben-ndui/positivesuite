@@ -1,40 +1,92 @@
 {
   "project_info": {
-    "project_number": "172022082358",
-    "project_id": "positive-planet-app",
-    "storage_bucket": "positive-planet-app.appspot.com"
+    "project_number": "699086388669",
+    "project_id": "positivesuite",
+    "storage_bucket": "positivesuite.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:172022082358:android:501b6a8621ef5f773da197",
+        "mobilesdk_app_id": "1:699086388669:android:bbdf337a88023f8852a6d4",
         "android_client_info": {
-          "package_name": "com.smoothndesign.ppf.positivesuite"
+          "package_name": "com.flutterflow.positiveplus"
         }
       },
       "oauth_client": [
         {
-          "client_id": "172022082358-f72d88h233c019t0vevo0sv9qv94rbhj.apps.googleusercontent.com",
+          "client_id": "699086388669-kli98nvj0j4a13sl7cqau76dh0881tgh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flutterflow.positiveplus",
+            "certificate_hash": "97fe38c6eadf69b46550d34adb9f5d4670072df2"
+          }
+        },
+        {
+          "client_id": "699086388669-4sh94d318m6e11dcim2lqvanppkkvsee.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBfQAZ_PK-6yUwqVZg3rUffdCfIj7EcadI"
+          "current_key": "AIzaSyDOrLvf3lG0LzkKUz1xBruWe0oHoaUZcYo"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "172022082358-f72d88h233c019t0vevo0sv9qv94rbhj.apps.googleusercontent.com",
+              "client_id": "699086388669-4sh94d318m6e11dcim2lqvanppkkvsee.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "172022082358-lkdnrq6tur1mt3svij08di3ivgq4epl5.apps.googleusercontent.com",
+              "client_id": "699086388669-49rb9j07kjcg2n8b9cegis70g9pku88i.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.smoothdesign.positivfav.positivfav"
+                "bundle_id": "com.smoothndesign.ppf.positivesuite"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:699086388669:android:88960f3fcd6fa70752a6d4",
+        "android_client_info": {
+          "package_name": "com.smoothndesign.ppf.positivesuite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "699086388669-iahscib12qtlv009gbgslv2gnurs3k0r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smoothndesign.ppf.positivesuite",
+            "certificate_hash": "97fe38c6eadf69b46550d34adb9f5d4670072df2"
+          }
+        },
+        {
+          "client_id": "699086388669-4sh94d318m6e11dcim2lqvanppkkvsee.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOrLvf3lG0LzkKUz1xBruWe0oHoaUZcYo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "699086388669-4sh94d318m6e11dcim2lqvanppkkvsee.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "699086388669-49rb9j07kjcg2n8b9cegis70g9pku88i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.smoothndesign.ppf.positivesuite"
               }
             }
           ]

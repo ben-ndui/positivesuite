@@ -3,7 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:positivesuite/common/Constants.dart';
 import 'package:positivesuite/common/myLoader.dart';
+import 'package:positivesuite/model/services/GoogleSignInProvider.dart';
 import 'package:positivesuite/model/services/authenticationService.dart';
+import 'package:provider/provider.dart';
 
 class SigningIn extends StatefulWidget {
   const SigningIn({Key? key}) : super(key: key);
@@ -19,6 +21,7 @@ class _SigningInState extends State<SigningIn> {
   bool loading = false;
 
   final emailController = TextEditingController();
+  final nameController = TextEditingController();
   final passwordController = TextEditingController();
 
   bool showSignIn = true;
@@ -27,6 +30,7 @@ class _SigningInState extends State<SigningIn> {
   void dispose() {
     // TODO: implement dispose
     emailController.dispose();
+    nameController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -36,6 +40,7 @@ class _SigningInState extends State<SigningIn> {
       _formKey.currentState!.reset();
       error = '';
       emailController.text = '';
+      nameController.text = '';
       passwordController.text = '';
       showSignIn = !showSignIn;
     });
@@ -43,7 +48,6 @@ class _SigningInState extends State<SigningIn> {
 
   @override
   Widget build(BuildContext context) {
-
     return loading
         ? MyLoader()
         : Scaffold(
@@ -54,7 +58,9 @@ class _SigningInState extends State<SigningIn> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextButton.icon(
-                    onPressed: () => toggleView(),
+                    onPressed: () {
+                      toggleView();
+                    },
                     icon:
                         Icon(showSignIn ? Icons.person_add : Icons.person_pin),
                     label: Text(
@@ -62,33 +68,29 @@ class _SigningInState extends State<SigningIn> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButton.icon(
-                    onPressed: (){
-
-                      toggleView();
-                    },
-                    icon:
-                        FaIcon(FontAwesomeIcons.google),
-                    label: Text("Compte",),
-                  ),
-                ),
               ],
             ),
             body: Stack(
-              alignment: Alignment.bottomCenter,
+              alignment: Alignment.topCenter,
               children: [
                 SvgPicture.asset(
                   "assets/backgrounds/login_background.svg",
                   fit: BoxFit.cover,
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 70.0),
+                  width: 250.0,
+                  height: 80.0,
+                  child: Center(
+                    child: Text("Positive + ", style: TextStyle(fontSize: 50.0, color: Colors.deepPurpleAccent,),),
+                  ),
                 ),
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Container(
                       width: personalWidth,
-                      height: personalHeight,
+                      height: !showSignIn ? 330.0 : personalHeight,
                       decoration: BoxDecoration(
                         color: kprimaryColor,
                         borderRadius: BorderRadius.circular(30.0),
@@ -113,7 +115,7 @@ class _SigningInState extends State<SigningIn> {
                       child: Center(
                         child: Container(
                           width: 490.0,
-                          height: 260.0,
+                          height: !showSignIn ? 325.0 : 260.0,
                           margin: EdgeInsets.only(left: 5.0, right: 5.0),
                           padding: EdgeInsets.all(30.0),
                           decoration: BoxDecoration(
@@ -127,16 +129,33 @@ class _SigningInState extends State<SigningIn> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Center(
+                                  child: !showSignIn ? TextFormField(
+                                    textAlign: TextAlign.center,
+                                    obscureText: false,
+                                    controller: nameController,
+                                    validator: (value) => value!.isEmpty
+                                        ? "Entrez un nom d\'utilisateur"
+                                        : null,
+                                    decoration: InputDecoration(
+                                      icon: Icon(Icons.drive_file_rename_outline),
+                                      labelText: 'Nom d\'utilisateur',
+                                    ),
+                                  ) : Container(),
+                                ),
+                                SizedBox(
+                                  height: 10.0,
+                                ),
+                                Center(
                                   child: TextFormField(
                                     textAlign: TextAlign.center,
                                     obscureText: false,
                                     controller: emailController,
                                     validator: (value) => value!.isEmpty
-                                        ? "Entrer une adresse email"
+                                        ? "Entrez une adresse email"
                                         : null,
                                     decoration: InputDecoration(
                                       icon: Icon(Icons.account_circle_outlined),
-                                      labelText: 'Nom d\'utilisateur',
+                                      labelText: 'Adresse email',
                                     ),
                                   ),
                                 ),
@@ -171,15 +190,18 @@ class _SigningInState extends State<SigningIn> {
                                         });
                                         var password =
                                             passwordController.value.text;
-                                        var useremail =
+                                        var name =
+                                            nameController.value.text;
+                                        var email =
                                             emailController.value.text;
                                         final _auth = AuthenticationService();
 
                                         /// CONNECTION WITH FIREBASE RIGHT HER
                                         dynamic res = showSignIn
-                                            ? await _auth.signIn(useremail, password)
-                                            : await _auth.signUp(useremail, password);
-                                        print(res.toString());
+                                            ? await _auth.signIn(
+                                                email, password)
+                                            : await _auth.signUp(name, email, password);
+                                        //print(res.toString());
                                         if (res == null) {
                                           setState(() {
                                             loading = false;

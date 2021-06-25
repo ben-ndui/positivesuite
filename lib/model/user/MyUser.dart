@@ -4,6 +4,7 @@
 /// Comments : This class allows you to manage users data easy from the database
 
 import 'package:flutter/material.dart';
+import 'package:positivesuite/model/user/Porteur.dart';
 
 class MyUser {
   ///User attibutes
@@ -11,7 +12,6 @@ class MyUser {
 
   ///__Constructor
   MyUser(this.uid, this.name, this.email, this.phone, this.location);
-
 
 
   /// Return user name
@@ -33,7 +33,8 @@ class MyUser {
       'name': this.name,
       'email': this.email,
       'phone': this.phone,
-      'location': this.location
+      'location': this.location,
+      'porteurList': this.location
     };
   }
 
@@ -41,4 +42,11 @@ class MyUser {
   factory MyUser.fromMap(Map<String, dynamic> map) {
     return new MyUser(map['uid'], map['name'], map['email'],map['phone'], map['location']);
   }
+}
+
+class MyUserData{
+  ///User attibutes
+  final String? uid, name, email, phone, location;
+
+  MyUserData(this.uid, this.name, this.email, this.phone, this.location);
 }

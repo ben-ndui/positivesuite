@@ -6,20 +6,38 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:positivesuite/model/user/MyUser.dart';
 
-class Porteur {
+class Porteur extends MyUser {
+  String? uid, name, email, phone, location;
   var nbLike, comments, activities, monConseiller, portrait;
-  bool zone;
+  bool? zone;
 
   /// __Constructor
-  Porteur({
-    this.nbLike,
-    this.comments,
-    this.activities,
-    this.monConseiller,
-    this.portrait,
-    required this.zone,
-  });
+  Porteur(
+      String? uid,
+      String? name,
+      String? email,
+      String? phone,
+      String? location,
+      var nbLike,
+      var comments,
+      var activities,
+      var monConseiller,
+      var portrait)
+      : super(
+          uid,
+          name,
+          email,
+          phone,
+          location,
+        ) {
+    this.nbLike = nbLike;
+    this.comments = comments;
+    this.activities = activities;
+    this.monConseiller = monConseiller;
+    this.portrait = portrait;
+  }
 
   /// Return the Porteur likes on this profile
   getNbLike() => this.nbLike;
