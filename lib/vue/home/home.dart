@@ -481,9 +481,7 @@ class _HomeState extends State<Home> {
           stream: DatabaseService(uid: widget.user!.uid).getPorteurs(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return MyLoader();
-            return PorteursList(
-              porteur: snapshot.data!.docs,
-            );
+            return PorteursList(user: widget.user,);
           },
         ),
       ),

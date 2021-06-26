@@ -3,8 +3,6 @@
 /// Current File : Class Porteur
 /// Comments : This class allows you to manage Porteur data easily from the database
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:positivesuite/model/user/MyUser.dart';
 

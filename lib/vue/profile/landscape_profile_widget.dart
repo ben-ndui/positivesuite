@@ -762,9 +762,7 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
                 stream: DatabaseService(uid: widget.user!.uid).getPorteurs(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData)
-                    return PorteursList(
-                      porteur: snapshot.data!.docs,
-                    );
+                    return PorteursList(user: widget.user,);
                   else
                     return MyLoader();
                 },
@@ -870,9 +868,7 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
           stream: DatabaseService(uid: widget.user!.uid).getPorteurs(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return MyLoader();
-            return PorteursList(
-              porteur: snapshot.data!.docs,
-            );
+            return PorteursList(user: widget.user,);
           },
         ),
       ),
