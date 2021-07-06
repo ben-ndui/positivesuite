@@ -1,11 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:positivesuite/common/Constants.dart';
 import 'package:positivesuite/common/myLoader.dart';
-import 'package:positivesuite/model/services/GoogleSignInProvider.dart';
 import 'package:positivesuite/model/services/authenticationService.dart';
-import 'package:provider/provider.dart';
 
 class SigningIn extends StatefulWidget {
   const SigningIn({Key? key}) : super(key: key);
@@ -19,6 +17,8 @@ class _SigningInState extends State<SigningIn> {
 
   String error = '';
   bool loading = false;
+
+  String? testM;
 
   final emailController = TextEditingController();
   final nameController = TextEditingController();
@@ -150,9 +150,18 @@ class _SigningInState extends State<SigningIn> {
                                     textAlign: TextAlign.center,
                                     obscureText: false,
                                     controller: emailController,
-                                    validator: (value) => value!.isEmpty
-                                        ? "Entrez une adresse email"
-                                        : null,
+                                    validator: (value) {
+
+                                      List<String> test = value!.split("@");
+
+                                      if(test[1].contains("positiveplanet.ngo")){
+                                        setState(() {
+                                          testM = value;
+                                        });
+                                        return null;
+                                      }
+                                      return "Veuillez entrer un email PPF s'il vous plait";
+                                    },
                                     decoration: InputDecoration(
                                       icon: Icon(Icons.account_circle_outlined),
                                       labelText: 'Adresse email',
@@ -188,12 +197,11 @@ class _SigningInState extends State<SigningIn> {
                                         setState(() {
                                           loading = true;
                                         });
-                                        var password =
+                                        String password =
                                             passwordController.value.text;
-                                        var name =
+                                        String name =
                                             nameController.value.text;
-                                        var email =
-                                            emailController.value.text;
+                                        String email = testM!;
                                         final _auth = AuthenticationService();
 
                                         /// CONNECTION WITH FIREBASE RIGHT HER

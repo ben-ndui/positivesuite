@@ -5,12 +5,40 @@ import 'package:positivesuite/model/user/Porteur.dart';
 
 class DatabaseService {
   var uid;
+  final FirebaseFirestore _f_instance = FirebaseFirestore.instance;
 
   /// Collection user
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection("users");
 
+  /// Collection user
+  final CollectionReference porteurCollection =
+      FirebaseFirestore.instance.collection("porteurs");
+
   DatabaseService({this.uid});
+
+  /// Permet de récupérer les donnée de n'importe quel collection de firebase
+  Future getUsersFromFirebase(String collection) async {
+    QuerySnapshot snapshot = await _f_instance.collection(collection).get();
+
+    return snapshot.docs;
+  }
+
+  /// Permet de récupérer les positiveurs de l'utilisateur courant
+  getPositiveurDataFrom(String? userThatYouLookingFor) async {
+    var data = await _f_instance
+        .collection("users")
+        .doc(uid)
+        .collection("positiveurs")
+        .where("name", isEqualTo: userThatYouLookingFor)
+        .get();
+
+    return data.docs;
+  }
+
+  Future queryData(String? queryString) async {
+    return porteurCollection.where('name', isEqualTo: queryString).get();
+  }
 
   /// Save user
   Future<void> saveUser(String? uid, String? name, String? email, String? phone,
@@ -22,12 +50,42 @@ class DatabaseService {
         'email': email,
         'phone': phone,
         'location': location,
+        'searchKey': name!.substring(0, 1),
       },
     );
   }
 
-  Future<void> updateUserinfo(String? uid, String? name, String? email, String? phone,
-      String? location) async {
+  /// Like a porter
+  Future<bool> likePorteur(String? name, String? whoLike, bool? like, bool toggle) async {
+    if(toggle){
+      porteurCollection.doc(name).update({'nbLike': like});
+      await porteurCollection.doc(name).collection("like").doc(whoLike).set({
+        'uid': uid,
+        'name': whoLike,
+      });
+      return true;
+    }
+    porteurCollection.doc(name).update({
+      'nbLike': like
+    });
+    await porteurCollection.doc(name).collection("like").doc(whoLike).delete();
+    return false;
+  }
+
+  Future<bool> unLikePorteur(String? name, String? whoLike, bool? like) async {
+    porteurCollection.doc(name).update({
+      'nbLike': like
+    });
+    await porteurCollection.doc(name).collection("like").doc(whoLike).delete();
+    return false;
+  }
+
+  Stream<QuerySnapshot> getNbPorteurLike(String name){
+    return porteurCollection.doc(name).collection('like').snapshots();
+  }
+
+  Future<void> updateUserinfo(String? uid, String? name, String? email,
+      String? phone, String? location) async {
     return await userCollection.doc(uid).update(
       {
         'uid': uid,
@@ -35,27 +93,55 @@ class DatabaseService {
         'email': email,
         'phone': phone,
         'location': location,
+        'searchKey': name!.substring(0, 1),
       },
     );
   }
 
   /// Save user
-  Future<void> savePositiveur(String? uid, String? name, String? email, String? phone,
-      String? location,  var nbLike, var comments, var activities, var monConseiller, var portrait) async {
-    final CollectionReference userPositiveurs = FirebaseFirestore.instance.collection("users").doc(uid).collection("positiveurs");
-
-    return await userPositiveurs.doc(name).set(
+  Future<void> savePorteur(
+    String? uid,
+    String? name,
+    var qp,
+    int? nbLike,
+    String? comments,
+    String? activities,
+    bool? portrait,
+  ) async {
+    return await porteurCollection.doc(name).set(
       {
         'uid': uid,
         'name': name,
-        'email': email,
-        'phone': phone,
-        'location': location,
+        'qp': qp,
         'nbLike': nbLike,
         'comments': comments,
         'activities': activities,
-        'monConseiller': monConseiller,
-        'portrait':portrait,
+        'portrait': portrait,
+        'searchKey': activities!.substring(0, 1).toUpperCase(),
+      },
+    );
+  }
+
+  /// Update Porteur infos
+  Future<void> updatePorteur(
+    String? uid,
+    String? name,
+    var qp,
+    int? nbLike,
+    String? comments,
+    String? activities,
+    bool? portrait,
+  ) async {
+    return await porteurCollection.doc(name).update(
+      {
+        'uid': uid,
+        'name': name,
+        'qp': qp,
+        'nbLike': nbLike,
+        'comments': comments,
+        'activities': activities,
+        'portrait': portrait,
+        'searchKey': activities!.substring(0, 1).toUpperCase(),
       },
     );
   }
@@ -67,14 +153,26 @@ class DatabaseService {
   }
 
   Porteur _porteurFromSnapShot(DocumentSnapshot snapshot) {
-    final userData = (snapshot.data() as dynamic);
-    return Porteur(userData["uid"], userData["name"], userData["email"],
-        userData["phone"], userData["location"], userData["nbLike"], userData["comments"], userData["activities"], userData["monConseiller"], userData["portrait"]);
+    final porteur = (snapshot.data() as dynamic);
+    //print("From Database services " + porteur["name"]);
+    return Porteur(
+      porteur["uid"],
+      porteur["name"],
+      porteur["qp"],
+      porteur["comments"],
+      porteur["activities"],
+      porteur["portrait"],
+    );
   }
 
   /// Stream to get current user
   Stream<MyUser> get user {
     return userCollection.doc(uid).snapshots().map(_userFromSnapShot);
+  }
+
+  /// Stream to get current user
+  Stream<Porteur> get porteur {
+    return porteurCollection.doc(uid).snapshots().map(_porteurFromSnapShot);
   }
 
   /// Stream list to get all users
@@ -83,13 +181,36 @@ class DatabaseService {
   }
 
   /// Stream list to get all user positiveurs
-  Stream<List<Porteur>> get allUserPositiveurs {
-    return userCollection.doc(uid).collection("positiveurs").snapshots().map(_porteurListFromSnapShot);
+  Stream<List<Porteur>> get allPorteurs {
+    return porteurCollection.snapshots().map(_porteurListFromSnapShot);
   }
 
   /// Stream to get current user positiveurs
   Stream<QuerySnapshot> getPorteurs() {
-    return userCollection.doc(uid).collection('positiveurs').orderBy('name').snapshots();
+    return porteurCollection.where('uid', isEqualTo: uid).snapshots();
+  }
+
+  /// Stream to get current user positiveurs
+  Stream<QuerySnapshot> getAllPorteurs(String? name) {
+    return porteurCollection
+        .where("searchKey", isEqualTo: name!.substring(0, 1).toUpperCase())
+        .snapshots();
+  }
+
+  searchByName(searchField) {
+    return _f_instance
+        .collection('porteurs')
+        .where('searchKey',
+            isEqualTo: searchField.substring(0, 1).toUpperCase())
+        .get();
+  }
+
+  searchByUserName(searchField) {
+    return _f_instance
+        .collection('users')
+        .where('searchKey',
+            isEqualTo: searchField.substring(0, 1).toUpperCase())
+        .get();
   }
 
   List<MyUser> _userListFromSnapShot(QuerySnapshot snapshot) {

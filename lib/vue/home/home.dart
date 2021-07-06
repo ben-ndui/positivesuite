@@ -23,26 +23,20 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   var _formKey = GlobalKey<FormState>();
   var nameController = TextEditingController();
-  var emailController = TextEditingController();
-  var phoneController = TextEditingController();
-  var locationController = TextEditingController();
+  var qpController = TextEditingController();
   var nbLikeController = TextEditingController();
   var commentsController = TextEditingController();
   var activitiesController = TextEditingController();
-  var monConseillerController = TextEditingController();
   var portraitController = TextEditingController();
 
   @override
   void dispose() {
     // TODO: implement dispose
     nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    locationController.dispose();
+    qpController.dispose();
     nbLikeController.dispose();
     commentsController.dispose();
     activitiesController.dispose();
-    monConseillerController.dispose();
     super.dispose();
   }
 
@@ -50,12 +44,9 @@ class _HomeState extends State<Home> {
     setState(() {
       _formKey.currentState!.reset();
       nameController.text = '';
-      emailController.text = '';
-      phoneController.text = '';
-      locationController.text = '';
+      qpController.text = '';
       nbLikeController.text = '';
       activitiesController.text = '';
-      monConseillerController.text = '';
     });
   }
 
@@ -300,26 +291,11 @@ class _HomeState extends State<Home> {
               Center(
                 child: TextFormField(
                   obscureText: false,
-                  controller: emailController,
+                  controller: activitiesController,
                   validator: (value) =>
-                      value!.isEmpty ? "Entrez une adresse email" : null,
+                  value!.length < 6 ? "Activité(s)" : null,
                   decoration: InputDecoration(
-                    icon: Icon(Icons.drive_file_rename_outline),
-                    labelText: 'Adresse email du porteur',
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Center(
-                child: TextFormField(
-                  obscureText: false,
-                  controller: phoneController,
-                  validator: (value) =>
-                      value!.length < 6 ? "Portable porteur" : null,
-                  decoration: InputDecoration(
-                    labelText: 'Numéro de téléphone du porteur',
+                    labelText: 'Activité(s) du porteur',
                     icon: Icon(Icons.drive_file_rename_outline),
                   ),
                 ),
@@ -330,11 +306,11 @@ class _HomeState extends State<Home> {
               Center(
                 child: TextFormField(
                   obscureText: false,
-                  controller: locationController,
+                  controller: qpController,
                   validator: (value) =>
-                      value!.length < 6 ? "Ville / Adresse" : null,
+                      value!.length < 6 ? "QP ?" : null,
                   decoration: InputDecoration(
-                    labelText: 'Ville / adresse du porteur',
+                    labelText: 'QP ?',
                     icon: Icon(Icons.drive_file_rename_outline),
                   ),
                 ),
@@ -355,36 +331,6 @@ class _HomeState extends State<Home> {
                 ),
               ),
               SizedBox(
-                height: 10.0,
-              ),
-              Center(
-                child: TextFormField(
-                  obscureText: false,
-                  controller: activitiesController,
-                  validator: (value) =>
-                      value!.length < 6 ? "Activité(s)" : null,
-                  decoration: InputDecoration(
-                    labelText: 'Activité(s) du porteur',
-                    icon: Icon(Icons.drive_file_rename_outline),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Center(
-                child: TextFormField(
-                  obscureText: false,
-                  controller: monConseillerController,
-                  validator: (value) =>
-                      value!.length < 6 ? "Conseiller(ère)s" : null,
-                  decoration: InputDecoration(
-                    labelText: 'Son / Sa conseillé-ère ?',
-                    icon: Icon(Icons.drive_file_rename_outline),
-                  ),
-                ),
-              ),
-              SizedBox(
                 height: 20.0,
               ),
               Container(
@@ -399,24 +345,18 @@ class _HomeState extends State<Home> {
                       final _auth = DatabaseService(uid: widget.user!.uid);
 
                       var name = nameController.value.text;
-                      var email = emailController.value.text;
-                      var phone = phoneController.value.text;
-                      var location = locationController.value.text;
+                      var qp = qpController.value.text;
                       var comments = commentsController.value.text;
                       var activities = activitiesController.value.text;
-                      var conseiller = monConseillerController.value.text;
 
                       /// CONNECTION WITH FIREBASE RIGHT HER
-                      _auth.savePositiveur(
+                      _auth.savePorteur(
                           widget.user!.uid,
                           name,
-                          email,
-                          phone,
-                          location,
-                          "",
+                          qp,
+                          0,
                           comments,
                           activities,
-                          widget.user!.uid,
                           false);
                     }
                   },
@@ -481,7 +421,7 @@ class _HomeState extends State<Home> {
           stream: DatabaseService(uid: widget.user!.uid).getPorteurs(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return MyLoader();
-            return PorteursList(user: widget.user,);
+            return PorteursList();
           },
         ),
       ),

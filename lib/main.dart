@@ -1,7 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:positivesuite/common/porteur_list.dart';
+import 'package:positivesuite/common/users_list.dart';
 import 'package:positivesuite/model/databases/database.dart';
 import 'package:positivesuite/model/services/GoogleSignInProvider.dart';
+import 'package:positivesuite/model/user/MyUser.dart';
+import 'package:positivesuite/model/user/Porteur.dart';
 import 'package:positivesuite/vue/home/component/splashScreen.dart';
 import 'package:positivesuite/vue/home/home.dart';
 import 'package:provider/provider.dart';
@@ -24,10 +28,16 @@ class MyApp extends StatelessWidget {
         Provider<AuthenticationService>(create: (_) => AuthenticationService()),
         Provider<GoogleSignInProvider>(create: (_) => GoogleSignInProvider()),
         Provider<DatabaseService>(create: (_) => DatabaseService(), child: SplashScreen(),),
-        StreamProvider(create: (context) => context.read<AuthenticationService>().user, initialData: null),
-        StreamProvider(create: (context) => context.read<DatabaseService>().user, initialData: null, child: SplashScreen(),),
-        StreamProvider(create: (context) => context.read<DatabaseService>().allUserPositiveurs, initialData: null, child: SplashScreen(),),
-        ChangeNotifierProvider(create: (context) => GoogleSignInProvider(), child: SplashScreen(),)
+        StreamProvider<List<MyUser>>.value(
+          value: DatabaseService().allUser,
+          initialData: [],
+          child: UsersList(),
+        ),
+        StreamProvider<List<Porteur>>.value(
+          value: DatabaseService().allPorteurs,
+          initialData: [],
+          child: PorteursList(),
+        ),
       ],
       child: MaterialApp(
         title: "Positive +",

@@ -25,6 +25,8 @@ dependencies:
   timeago: ^3.1.0
   latlng: ^0.1.0
   flutter_svg_provider: ^0.1.9
+  material_floating_search_bar: ^0.3.4
+  flutter_phone_direct_caller: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -4,13 +4,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:positivesuite/common/Constants.dart';
 import 'package:positivesuite/common/myLoader.dart';
 import 'package:positivesuite/common/porteur_list.dart';
 import 'package:positivesuite/common/users_list.dart';
+import 'package:positivesuite/common/users_porteurs_tile.dart';
 import 'package:positivesuite/model/databases/database.dart';
 import 'package:positivesuite/model/services/authenticationService.dart';
 import 'package:positivesuite/model/user/MyUser.dart';
+import 'package:positivesuite/model/user/Porteur.dart';
+import 'package:positivesuite/vue/home/add/add_porteur_screen.dart';
 import 'package:positivesuite/vue/profile/profile_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -37,17 +41,21 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   bool? isNull = false;
+  bool? isUpdate = false;
   String? userID;
+
+  late TextEditingController searchController =
+      TextEditingController(text: 'Chercher...');
+  bool searchState = false;
+  List<Porteur?> porteursList = [];
+  List<Porteur?> searchList = [];
 
   var _formKeyPositiveur = GlobalKey<FormState>();
   var nameController = TextEditingController();
-  var emailController = TextEditingController();
-  var phoneController = TextEditingController();
   var locationController = TextEditingController();
   var nbLikeController = TextEditingController();
   var commentsController = TextEditingController();
   var activitiesController = TextEditingController();
-  var monConseillerController = TextEditingController();
   var portraitController = TextEditingController();
 
   @override
@@ -92,553 +100,567 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
       key: scaffoldKey,
       backgroundColor: Color(0xFFEEEEEE),
       body: SafeArea(
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment(0, 1.16),
-              child: Container(
-                alignment: Alignment.bottomCenter,
-                child: SvgPicture.asset(
-                  'assets/images/login_background.svg',
-                  fit: BoxFit.contain,
+        child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment(0, 1.16),
+                child: Container(
                   alignment: Alignment.bottomCenter,
+                  child: SvgPicture.asset(
+                    'assets/images/login_background.svg',
+                    fit: BoxFit.contain,
+                    alignment: Alignment.bottomCenter,
+                  ),
                 ),
               ),
-            ),
-            Column(
-              children: [
-                SingleChildScrollView(
-                  child: Align(
-                    alignment: Alignment.topCenter,
+              Column(
+                children: [
+                  topMenu(context),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Align(
+                    ///Formulaire modification infos perso
+                    alignment: Alignment(-0.04, 0.65),
                     child: Container(
-                      width: 200,
-                      height: 200,
-                      margin: EdgeInsets.only(top: 50.0, left: 30.0),
-                      padding: EdgeInsets.all(3.0),
+                      width: 800,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Container(
-                                  child: Column(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          myFavorites();
-                                          print('IconButton pressed ...');
-                                        },
-                                        icon: FaIcon(
-                                          FontAwesomeIcons.heart,
-                                          color: Color(0xFFFF3A72),
-                                          size: 30,
-                                        ),
-                                        iconSize: 30,
-                                      ),
-                                      Text("Mes ❤️"),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  child: Column(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          _showMyDialog();
-                                        },
-                                        icon: Icon(
-                                          Icons.group,
-                                          color: Color(0xFF00DBF9),
-                                          size: 30,
-                                        ),
-                                        iconSize: 30,
-                                      ),
-                                      Text("Teams")
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Container(
-                                  child: Column(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProfileWidget(
-                                                    user: widget.user,
-                                                  ),
-                                            ),
-                                          );
-                                        },
-                                        icon: Icon(
-                                          Icons.home,
-                                          color: Color(0xFFFF3A72),
-                                          size: 30,
-                                        ),
-                                        iconSize: 30,
-                                      ),
-                                      Text("Accueil")
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  child: Column(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.account_circle_rounded,
-                                          color: Color(0xFFEB00EA),
-                                          size: 30,
-                                        ),
-                                        iconSize: 30,
-                                      ),
-                                      Text("Mon profil")
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            child: Column(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    addPositiveur();
-                                    print('addPositiveurButton pressed ...');
-                                  },
-                                  icon: Icon(
-                                    Icons.add_circle,
-                                    color: Color(0xFF1CFFC5),
-                                    size: 30,
-                                  ),
-                                  iconSize: 30,
-                                ),
-                                Text("Ajouter un Positiveur")
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 15.0,
-                ),
-                Align(
-                  ///Formulaire modification infos perso
-                  alignment: Alignment(-0.04, 0.65),
-                  child: Container(
-                    width: 800,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: Color(0xFFF2F2F2),
-                      ),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.topCenter,
-                      children: [
-                        Container(
-                          child: Text(
-                            "Modifier mes informations \n personnels",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurpleAccent,
-                              fontSize: 15.0,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          margin: EdgeInsets.all(20.0),
+                        border: Border.all(
+                          color: Color(0xFFF2F2F2),
                         ),
-                        StreamBuilder<MyUser>(
-                            stream: DatabaseService(uid: widget.user!.uid).user,
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                final user = snapshot.data;
-                                return Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                        EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
+                      ),
+                      child: Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            child: Text(
+                              "Modifier mes informations \n personnels",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurpleAccent,
+                                fontSize: 15.0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            margin: EdgeInsets.all(20.0),
+                          ),
+                          StreamBuilder<MyUser>(
+                              stream:
+                                  DatabaseService(uid: widget.user!.uid).user,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final user = snapshot.data;
+                                  return Form(
+                                    key: _formKey,
+                                    child: Column(
+                                      mainAxisAlignment:
                                           MainAxisAlignment.center,
-                                          children: [
-                                            SizedBox(
-                                              height: 50.0,
-                                            ),
-                                            TextFormField(
-                                              controller:
-                                              nameTextFieldController,
-                                              validator: (value) => value!
-                                                  .isEmpty
-                                                  ? "Veuillez saisir votre nom d'utilisateur"
-                                                  : null,
-                                              obscureText: false,
-                                              decoration: InputDecoration(
-                                                hintText: user!.name != null
-                                                    ? user.name
-                                                    : "Saisir mon nom et prénom",
-                                                hintStyle: FlutterFlowTheme
-                                                    .title3
-                                                    .override(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16.0,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                                enabledBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color: Colors.black12,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
-                                                focusedBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color:
-                                                    Colors.deepPurpleAccent,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              20, 20, 20, 20),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                height: 50.0,
                                               ),
-                                              style: FlutterFlowTheme.title3
-                                                  .override(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16.0,
-                                              ),
-                                              textAlign: TextAlign.start,
-                                            ),
-                                            SizedBox(
-                                              height: 15.0,
-                                            ),
-                                            TextFormField(
-                                              controller:
-                                              emailTextFieldController,
-                                              validator: (value) => value!
-                                                  .isEmpty
-                                                  ? "Veuillez saisir votre adresse email"
-                                                  : null,
-                                              obscureText: false,
-                                              decoration: InputDecoration(
-                                                hintText: user.email != null
-                                                    ? user.email
-                                                    : "Saisir mon adresse email",
-                                                hintStyle: FlutterFlowTheme
-                                                    .title3
-                                                    .override(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16.0,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                                enabledBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color: Colors.black12,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
-                                                focusedBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color:
-                                                    Colors.deepPurpleAccent,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
-                                              ),
-                                              style: FlutterFlowTheme.title3
-                                                  .override(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16.0,
-                                              ),
-                                              textAlign: TextAlign.start,
-                                            ),
-                                            SizedBox(
-                                              height: 10.0,
-                                            ),
-                                            TextFormField(
-                                              controller:
-                                              phoneTextFieldController,
-                                              validator: (value) => value!
-                                                  .isEmpty
-                                                  ? "Veuillez saisir votre numéro de téléphone"
-                                                  : null,
-                                              obscureText: false,
-                                              decoration: InputDecoration(
-                                                hintText: user.phone != null
-                                                    ? user.phone
-                                                    : "Saisir mon numéro de téléphone",
-                                                hintStyle: FlutterFlowTheme
-                                                    .title3
-                                                    .override(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16.0,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                                enabledBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color: Colors.black12,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
-                                                focusedBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color:
-                                                    Colors.deepPurpleAccent,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
-                                              ),
-                                              style: FlutterFlowTheme.title3
-                                                  .override(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16.0,
-                                              ),
-                                              textAlign: TextAlign.start,
-                                            ),
-                                            SizedBox(
-                                              height: 10.0,
-                                            ),
-                                            TextFormField(
-                                              controller:
-                                              antenneTextFieldController,
-                                              validator: (value) => value!
-                                                  .isEmpty
-                                                  ? "Veuillez saisir votre antenne PPF"
-                                                  : null,
-                                              obscureText: false,
-                                              decoration: InputDecoration(
-                                                hintText: user.location != null
-                                                    ? user.location
-                                                    : "Saisir le nom de mon antenne PPF",
-                                                hintStyle: FlutterFlowTheme
-                                                    .title3
-                                                    .override(
-                                                  fontFamily: 'Poppins',
-                                                  fontSize: 16.0,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                                enabledBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color: Colors.black12,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
-                                                focusedBorder:
-                                                UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                    color:
-                                                    Colors.deepPurpleAccent,
-                                                    width: 1,
-                                                  ),
-                                                  borderRadius:
-                                                  BorderRadius.only(
-                                                    bottomLeft:
-                                                    Radius.circular(1),
-                                                    bottomRight:
-                                                    Radius.circular(1),
-                                                    topLeft: Radius.circular(1),
-                                                    topRight:
-                                                    Radius.circular(1),
-                                                  ),
-                                                ),
-                                              ),
-                                              style: FlutterFlowTheme.title3
-                                                  .override(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16.0,
-                                              ),
-                                              textAlign: TextAlign.start,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10.0,
-                                      ),
-                                      StreamBuilder<MyUser>(
-                                          stream: DatabaseService(
-                                              uid: widget.user!.uid)
-                                              .user,
-                                          builder: (context, snapshot) {
-                                            if (snapshot.hasData) {
-                                              return FFButtonWidget(
-                                                onPressed: () async {
-                                                  if (_formKey.currentState!
-                                                      .validate()) {
-                                                    var name =
-                                                        nameTextFieldController!
-                                                            .value.text;
-                                                    var email =
-                                                        emailTextFieldController!
-                                                            .value.text;
-                                                    var phone =
-                                                        phoneTextFieldController!
-                                                            .value.text;
-                                                    var location =
-                                                        antenneTextFieldController!
-                                                            .value.text;
-
-                                                    await DatabaseService(
-                                                        uid: widget
-                                                            .user!.uid)
-                                                        .updateUserinfo(
-                                                        widget.user!.uid,
-                                                        name,
-                                                        email,
-                                                        phone,
-                                                        location)
-                                                        .whenComplete(() => Navigator
-                                                        .of(context)
-                                                        .push(
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                ProfileWidget(
-                                                                  user: widget.user,
-                                                                ))));
-                                                  }
-                                                  //print('EnregistrerButton pressed ...');
-                                                },
-                                                text: 'Enregistrer',
-                                                options: FFButtonOptions(
-                                                  width: 130,
-                                                  height: 40,
-                                                  color:
-                                                  Colors.deepPurpleAccent,
-                                                  textStyle: FlutterFlowTheme
+                                              TextFormField(
+                                                controller:
+                                                    nameTextFieldController,
+                                                validator: (value) => value!
+                                                        .isEmpty
+                                                    ? "Veuillez saisir votre nom d'utilisateur"
+                                                    : null,
+                                                obscureText: false,
+                                                decoration: InputDecoration(
+                                                  hintText: user!.name != null
+                                                      ? user.name
+                                                      : "Saisir mon nom et prénom",
+                                                  hintStyle: FlutterFlowTheme
                                                       .title3
                                                       .override(
                                                     fontFamily: 'Poppins',
-                                                    color: Colors.white,
+                                                    fontSize: 16.0,
+                                                    fontStyle: FontStyle.italic,
                                                   ),
-                                                  borderSide: BorderSide(
-                                                    color: Colors.transparent,
-                                                    width: 1,
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors.black12,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
                                                   ),
-                                                  borderRadius: 12,
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors
+                                                          .deepPurpleAccent,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
+                                                  ),
                                                 ),
-                                              );
-                                            } else {
-                                              return MyLoader();
-                                            }
-                                          }),
-                                      SizedBox(
-                                        height: 15.0,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return MyLoader();
-                              }
-                            }),
+                                                style: FlutterFlowTheme.title3
+                                                    .override(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 16.0,
+                                                ),
+                                                textAlign: TextAlign.start,
+                                              ),
+                                              SizedBox(
+                                                height: 15.0,
+                                              ),
+                                              TextFormField(
+                                                controller:
+                                                    emailTextFieldController,
+                                                validator: (value) => value!
+                                                        .isEmpty
+                                                    ? "Veuillez saisir votre adresse email"
+                                                    : null,
+                                                obscureText: false,
+                                                decoration: InputDecoration(
+                                                  hintText: user.email != null
+                                                      ? user.email
+                                                      : "Saisir mon adresse email",
+                                                  hintStyle: FlutterFlowTheme
+                                                      .title3
+                                                      .override(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 16.0,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors.black12,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
+                                                  ),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors
+                                                          .deepPurpleAccent,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
+                                                  ),
+                                                ),
+                                                style: FlutterFlowTheme.title3
+                                                    .override(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 16.0,
+                                                ),
+                                                textAlign: TextAlign.start,
+                                              ),
+                                              SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              TextFormField(
+                                                controller:
+                                                    phoneTextFieldController,
+                                                validator: (value) => value!
+                                                        .isEmpty
+                                                    ? "Veuillez saisir votre numéro de téléphone"
+                                                    : null,
+                                                obscureText: false,
+                                                decoration: InputDecoration(
+                                                  hintText: user.phone != null
+                                                      ? user.phone
+                                                      : "Saisir mon numéro de téléphone",
+                                                  hintStyle: FlutterFlowTheme
+                                                      .title3
+                                                      .override(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 16.0,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors.black12,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
+                                                  ),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors
+                                                          .deepPurpleAccent,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
+                                                  ),
+                                                ),
+                                                style: FlutterFlowTheme.title3
+                                                    .override(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 16.0,
+                                                ),
+                                                textAlign: TextAlign.start,
+                                              ),
+                                              SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              TextFormField(
+                                                controller:
+                                                    antenneTextFieldController,
+                                                validator: (value) => value!
+                                                        .isEmpty
+                                                    ? "Veuillez saisir votre antenne PPF"
+                                                    : null,
+                                                obscureText: false,
+                                                decoration: InputDecoration(
+                                                  hintText: user.location !=
+                                                          null
+                                                      ? user.location
+                                                      : "Saisir le nom de mon antenne PPF",
+                                                  hintStyle: FlutterFlowTheme
+                                                      .title3
+                                                      .override(
+                                                    fontFamily: 'Poppins',
+                                                    fontSize: 16.0,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors.black12,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
+                                                  ),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors
+                                                          .deepPurpleAccent,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(1),
+                                                      bottomRight:
+                                                          Radius.circular(1),
+                                                      topLeft:
+                                                          Radius.circular(1),
+                                                      topRight:
+                                                          Radius.circular(1),
+                                                    ),
+                                                  ),
+                                                ),
+                                                style: FlutterFlowTheme.title3
+                                                    .override(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 16.0,
+                                                ),
+                                                textAlign: TextAlign.start,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10.0,
+                                        ),
+                                        StreamBuilder<MyUser>(
+                                            stream: DatabaseService(
+                                                    uid: widget.user!.uid)
+                                                .user,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                return FFButtonWidget(
+                                                  onPressed: () async {
+                                                    if (_formKey.currentState!
+                                                        .validate()) {
+                                                      var name =
+                                                          nameTextFieldController!
+                                                              .value.text;
+                                                      var email =
+                                                          emailTextFieldController!
+                                                              .value.text;
+                                                      var phone =
+                                                          phoneTextFieldController!
+                                                              .value.text;
+                                                      var location =
+                                                          antenneTextFieldController!
+                                                              .value.text;
+
+                                                      await DatabaseService(
+                                                              uid: widget
+                                                                  .user!.uid)
+                                                          .updateUserinfo(
+                                                              widget.user!.uid,
+                                                              name,
+                                                              email,
+                                                              phone,
+                                                              location);
+                                                    }
+                                                    //print('EnregistrerButton pressed ...');
+                                                  },
+                                                  text: 'Enregistrer',
+                                                  options: FFButtonOptions(
+                                                    width: 130,
+                                                    height: 40,
+                                                    color:
+                                                        Colors.deepPurpleAccent,
+                                                    textStyle: FlutterFlowTheme
+                                                        .title3
+                                                        .override(
+                                                      fontFamily: 'Poppins',
+                                                      color: Colors.white,
+                                                    ),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.transparent,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius: 12,
+                                                  ),
+                                                );
+                                              } else {
+                                                return MyLoader();
+                                              }
+                                            }),
+                                        SizedBox(
+                                          height: 15.0,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return MyLoader();
+                                }
+                              }),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Align topMenu(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        width: 200,
+        height: 200,
+        alignment: Alignment.center,
+        margin: EdgeInsets.only(top: 50.0, left: 30.0),
+        padding: EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ProfileWidget(
+                                  user: widget.user,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: Color(0xFFFF3A72),
+                            size: 30,
+                          ),
+                          iconSize: 30,
+                        ),
+                        Text("Retour")
                       ],
                     ),
                   ),
-                )
-              ],
+                  Container(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            _showMyDialog();
+                          },
+                          icon: Icon(
+                            Icons.group,
+                            color: Color(0xFF00DBF9),
+                            size: 30,
+                          ),
+                          iconSize: 30,
+                        ),
+                        Text("Teams")
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            myFavorites();
+                            //print('Landscape favebutton pressed ...');
+                          },
+                          icon: FaIcon(
+                            FontAwesomeIcons.heart,
+                            color: Color(0xFFFF3A72),
+                            size: 30,
+                          ),
+                          iconSize: 30,
+                        ),
+                        Text("Mes ❤️"),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.account_circle_rounded,
+                            color: Color(0xFFEB00EA),
+                            size: 30,
+                          ),
+                          iconSize: 30,
+                        ),
+                        Text("Mon profil")
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddPorteur(user: widget.user,)));
+                    },
+                    icon: Icon(
+                      Icons.add_circle,
+                      color: Color(0xFF1CFFC5),
+                      size: 30,
+                    ),
+                    iconSize: 30,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -762,7 +784,13 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
                 stream: DatabaseService(uid: widget.user!.uid).getPorteurs(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData)
-                    return PorteursList(user: widget.user,);
+                    return ListView.builder(
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        return UserPorteurTile(
+                            user: snapshot.data!.docs[index]);
+                      },
+                    );
                   else
                     return MyLoader();
                 },
@@ -868,7 +896,7 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
           stream: DatabaseService(uid: widget.user!.uid).getPorteurs(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return MyLoader();
-            return PorteursList(user: widget.user,);
+            return PorteursList();
           },
         ),
       ),
@@ -941,7 +969,7 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
                   obscureText: false,
                   controller: nameController,
                   validator: (value) =>
-                  value!.isEmpty ? "Nom du porteur de projet" : null,
+                      value!.isEmpty ? "Nom du porteur de projet" : null,
                   decoration: InputDecoration(
                     icon: Icon(Icons.drive_file_rename_outline),
                     labelText: 'Nom du porteur',
@@ -954,69 +982,9 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
               Center(
                 child: TextFormField(
                   obscureText: false,
-                  controller: emailController,
-                  validator: (value) =>
-                  value!.isEmpty ? "Entrez une adresse email" : null,
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.drive_file_rename_outline),
-                    labelText: 'Adresse email du porteur',
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Center(
-                child: TextFormField(
-                  obscureText: false,
-                  controller: phoneController,
-                  validator: (value) =>
-                  value!.length < 6 ? "Portable porteur" : null,
-                  decoration: InputDecoration(
-                    labelText: 'Numéro de téléphone du porteur',
-                    icon: Icon(Icons.drive_file_rename_outline),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Center(
-                child: TextFormField(
-                  obscureText: false,
-                  controller: locationController,
-                  validator: (value) =>
-                  value!.length < 6 ? "Ville / Adresse" : null,
-                  decoration: InputDecoration(
-                    labelText: 'Ville / adresse du porteur',
-                    icon: Icon(Icons.drive_file_rename_outline),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Center(
-                child: TextFormField(
-                  obscureText: false,
-                  controller: commentsController,
-                  validator: (value) =>
-                  value!.length < 6 ? "Commentaires" : null,
-                  decoration: InputDecoration(
-                    labelText: 'Commentaires',
-                    icon: Icon(Icons.drive_file_rename_outline),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Center(
-                child: TextFormField(
-                  obscureText: false,
                   controller: activitiesController,
                   validator: (value) =>
-                  value!.length < 6 ? "Activité(s)" : null,
+                      value!.length < 6 ? "Activité(s)" : null,
                   decoration: InputDecoration(
                     labelText: 'Activité(s) du porteur',
                     icon: Icon(Icons.drive_file_rename_outline),
@@ -1029,11 +997,25 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
               Center(
                 child: TextFormField(
                   obscureText: false,
-                  controller: monConseillerController,
-                  validator: (value) =>
-                  value!.length < 6 ? "Conseiller(ère)s" : null,
+                  controller: locationController,
+                  validator: (value) => value!.isEmpty ? "QP ? " : null,
                   decoration: InputDecoration(
-                    labelText: 'Son / Sa conseillé-ère ?',
+                    labelText: 'QP ?',
+                    icon: Icon(Icons.drive_file_rename_outline),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Center(
+                child: TextFormField(
+                  obscureText: false,
+                  controller: commentsController,
+                  validator: (value) =>
+                      value!.length < 6 ? "Commentaires" : null,
+                  decoration: InputDecoration(
+                    labelText: 'Commentaires',
                     icon: Icon(Icons.drive_file_rename_outline),
                   ),
                 ),
@@ -1053,25 +1035,17 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
                       final _auth = DatabaseService(uid: widget.user!.uid);
 
                       var name = nameController.value.text;
-                      var email = emailController.value.text;
-                      var phone = phoneController.value.text;
-                      var location = locationController.value.text;
+                      var qp = locationController.value.text;
                       var comments = commentsController.value.text;
                       var activities = activitiesController.value.text;
-                      var conseiller = monConseillerController.value.text;
 
                       /// CONNECTION WITH FIREBASE RIGHT HER
-                      _auth.savePositiveur(
-                          widget.user!.uid,
-                          name,
-                          email,
-                          phone,
-                          location,
-                          "",
-                          comments,
-                          activities,
-                          widget.user!.uid,
-                          false).whenComplete(() => Center(child: Text("Ajouté"),));
+                      _auth
+                          .savePorteur(widget.user!.uid, name, qp, 0, comments,
+                              activities, false)
+                          .whenComplete(() => Center(
+                                child: Text("Ajouté"),
+                              ));
                     }
                   },
                   child: Text(
@@ -1089,5 +1063,84 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
       ),
     );
   }
-}
 
+  Widget buildFloatingSearchBar() {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
+    return StreamBuilder<List<Porteur>>(
+      stream: DatabaseService().allPorteurs,
+      builder: (context, snapshot) {
+        return FloatingSearchBar(
+          hint: 'Chercher...',
+          scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+          transitionDuration: const Duration(milliseconds: 800),
+          transitionCurve: Curves.easeInOut,
+          physics: const BouncingScrollPhysics(),
+          axisAlignment: isPortrait ? 0.0 : -1.0,
+          openAxisAlignment: 0.0,
+          width: isPortrait ? 600 : 500,
+          debounceDelay: const Duration(milliseconds: 500),
+          onQueryChanged: (query) async {
+            print("Je cherche ${query}");
+            porteursList = snapshot.data!;
+            porteursList.forEach((element) {
+              if (element!.name!.contains(query)) {
+                searchList.add(element);
+                print("Voici l'utilisateur trouvé : ${element.name}");
+              }
+              Text("Aucun n'utilisateur ou porteur de ce nom");
+            });
+          },
+          // Specify a custom transition to be used for
+          // animating between opened and closed stated.
+          transition: CircularFloatingSearchBarTransition(),
+          actions: [
+            FloatingSearchBarAction(
+              showIfOpened: false,
+              child: CircularButton(
+                icon: const Icon(
+                  Icons.account_circle_sharp,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onPressed: () {
+                  DatabaseService(uid: widget.user!.uid)
+                      .queryData(searchController.text);
+                },
+              ),
+            ),
+            FloatingSearchBarAction.searchToClear(
+              showIfClosed: false,
+            ),
+          ],
+          builder: (context, transition) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Material(
+                color: Colors.white,
+                elevation: 4.0,
+                child: Container(
+                  color: Colors.deepPurpleAccent,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: searchList.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text("${searchList[index]!.name}"),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:positivesuite/common/myLoader.dart';
 import 'package:positivesuite/model/services/authenticationService.dart';
 import 'package:positivesuite/model/user/MyUser.dart';
-import 'package:positivesuite/vue/home/home.dart';
 import 'package:positivesuite/vue/profile/profile_widget.dart';
 import 'package:positivesuite/vue/signIn/signIn.dart';
 

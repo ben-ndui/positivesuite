@@ -7,33 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:positivesuite/model/user/MyUser.dart';
 
 class Porteur extends MyUser {
-  String? uid, name, email, phone, location;
-  var nbLike, comments, activities, monConseiller, portrait;
+  var nbLike, comments, activities, portrait;
   bool? zone;
 
   /// __Constructor
-  Porteur(
-      String? uid,
-      String? name,
-      String? email,
-      String? phone,
-      String? location,
-      var nbLike,
-      var comments,
-      var activities,
-      var monConseiller,
-      var portrait)
+  Porteur(var uid, var name, var qp, var comments,
+      var activities, var portrait)
       : super(
           uid,
           name,
-          email,
-          phone,
-          location,
+          "",
+          "",
+          qp,
         ) {
     this.nbLike = nbLike;
     this.comments = comments;
     this.activities = activities;
-    this.monConseiller = monConseiller;
     this.portrait = portrait;
   }
 
@@ -45,10 +34,6 @@ class Porteur extends MyUser {
 
   /// Return this Porteur activities
   getActivity() => this.activities;
-
-  /// Return this Porteur Conseiller
-  /// "This porteur is manage by (Conseiller)"
-  getMonConseiller() => this.monConseiller;
 
   /// This return a boolean
   /// Just to let you know if this Porteur already have a pdf presentation or non

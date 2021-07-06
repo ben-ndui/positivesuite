@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:positivesuite/model/services/authenticationService.dart';
+import 'package:positivesuite/vue/home/component/splashScreen.dart';
 import 'package:provider/provider.dart';
 
 import 'Constants.dart';

@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.smoothndesign.ppf.positivesuite">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="positivesuite"
+        android:label="Positive Fav'"
         android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
