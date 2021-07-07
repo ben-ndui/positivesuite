@@ -11,13 +11,10 @@ import 'package:positivesuite/common/porteur_list.dart';
 import 'package:positivesuite/common/users_list.dart';
 import 'package:positivesuite/common/users_porteurs_tile.dart';
 import 'package:positivesuite/model/databases/database.dart';
-import 'package:positivesuite/model/services/authenticationService.dart';
 import 'package:positivesuite/model/user/MyUser.dart';
 import 'package:positivesuite/model/user/Porteur.dart';
 import 'package:positivesuite/vue/home/add/add_porteur_screen.dart';
-import 'package:positivesuite/vue/profile/profile_widget.dart';
 import 'package:provider/provider.dart';
-
 import '../flutter_flow/flutter_flow_theme.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -554,13 +551,7 @@ class _LandScapeProfileWidgetState extends State<LandScapeProfileWidget> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => ProfileWidget(
-                                  user: widget.user,
-                                ),
-                              ),
-                            );
+                            Navigator.of(context).pop();
                           },
                           icon: Icon(
                             Icons.arrow_back_ios_rounded,
